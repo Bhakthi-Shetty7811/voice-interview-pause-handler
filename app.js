@@ -35,7 +35,6 @@ function processAudio() {
         state: getCurrentState()
     });
 
-
     if (pauseResult.interrupt) {
         transcriptEl.textContent += ' [AI RESPONSE] ';
     }
