@@ -23,7 +23,6 @@ startBtn.onclick = async () => {
 function processAudio() {
     requestAnimationFrame(processAudio);
 
-
     analyser.getByteTimeDomainData(dataArray);
     const energy = getVADState(dataArray);
     const currentState = getCurrentState();
