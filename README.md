@@ -12,7 +12,7 @@ In many voice AI interviews, the system interrupts users too early because it tr
 * Distinguishes thinking pauses from completed answers
 * Makes voice interviews feel more natural and less stressful
 
----
+--- 
 
 ### How does it work (simple explanation)?
 
