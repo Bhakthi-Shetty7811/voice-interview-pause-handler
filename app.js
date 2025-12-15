@@ -10,9 +10,9 @@ let interviewEnded = false;
 let hasSpokenInTurn = false;
 
 const questions = [
-  "Tell me about a challenging project you worked on.",
-  "What was your role in that project?",
-  "What did you learn from this experience?"
+  "Can you briefly explain what problem this prototype is solving?",
+  "Why do pauses cause issues in browser-based voice interviews?",
+  "What improvement does your approach introduce?"
 ];
 
 const MAX_QUESTIONS = questions.length;
