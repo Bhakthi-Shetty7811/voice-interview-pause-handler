@@ -3,8 +3,11 @@ import { getVADState } from './audio/vad.js';
 import { updatePause } from './conversation/pauseLogic.js';
 import { updateStateMachine, getCurrentState } from './conversation/stateMachine.js';
 import { updateDebugPanel } from './ui/debugPanel.js';
+
 let turnCount = 0;
 let currentUtterance = "";
+let interviewEnded = false;
+let hasSpokenInTurn = false;
 
 const questions = [
   "Tell me about a challenging project you worked on.",
@@ -12,50 +15,72 @@ const questions = [
   "What did you learn from this experience?"
 ];
 
+const MAX_QUESTIONS = questions.length;
+
 let audioContext, analyser, dataArray;
-let silenceStart = null;
 
 const startBtn = document.getElementById('startBtn');
 const transcriptEl = document.getElementById('transcript');
 
+startBtn.disabled = false;
+startBtn.textContent = "Start Interview";
+transcriptEl.textContent = "Waiting for interview to start...";
+
 startBtn.onclick = async () => {
+    if (interviewEnded) return;
+
     const micData = await initMic();
     audioContext = micData.audioContext;
     await audioContext.resume();
 
     analyser = micData.analyser;
     dataArray = micData.dataArray;
+
+    transcriptEl.textContent = `AI (1): ${questions[0]}\n`;
     processAudio();
 };
 
 function processAudio() {
+    if (interviewEnded) return;
+
     requestAnimationFrame(processAudio);
 
     analyser.getByteTimeDomainData(dataArray);
     const energy = getVADState(dataArray);
+
+    const pauseResult = updatePause(energy, getCurrentState());
+
+    updateStateMachine(pauseResult);
     const currentState = getCurrentState();
 
-    const pauseResult = updatePause(energy, currentState);
-
     if (energy > 5 && currentState === "USER_SPEAKING") {
+        hasSpokenInTurn = true;
         currentUtterance += "word ";
         transcriptEl.textContent = `Candidate: ${currentUtterance}`;
     }
 
-    updateStateMachine(pauseResult);
     updateDebugPanel({
         ...pauseResult,
-        state: getCurrentState()
+        state: currentState
     });
 
-    if (pauseResult.interrupt) {
+    if (pauseResult.interrupt && hasSpokenInTurn && !interviewEnded) {
         transcriptEl.textContent += "\n[End of candidate response]\n";
 
         currentUtterance = "";
+        hasSpokenInTurn = false;
         turnCount++;
 
-        const question = questions[turnCount % questions.length];
-        transcriptEl.textContent += `\nAI (${turnCount}): ${question}\n`;
-    }
+        if (turnCount < MAX_QUESTIONS) {
+            transcriptEl.textContent += `\nAI (${turnCount + 1}): ${questions[turnCount]}\n`;
+        } else {
+            transcriptEl.textContent += "\n🎉 Interview Completed. Thank you for your responses.\n";
+            interviewEnded = true;
 
+            startBtn.disabled = true;
+            startBtn.textContent = "Interview Completed";
+        }
+    }
 }
+
+
