@@ -6,18 +6,38 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Voice Interview Pause Handler Demo</h1>
-  
-  <div id="debug-panel">
-    <p>Current State: <span id="state">IDLE</span></p>
-    <p>Silence Timer: <span id="silence">0</span> ms</p>
-    <p>Threshold: <span id="threshold">0</span> ms</p>
-    <canvas id="energyCanvas" width="500" height="100"></canvas>
-  </div>
 
-  <button id="startBtn">Start Interview</button>
-  <p>Transcript: <span id="transcript"></span></p>
+  <h1>🎤 Voice Interview Pause Handler Demo</h1>
+
+  <!-- Interview Status -->
+  <section class="card">
+    <h2>Interview Status</h2>
+    <p><strong>Current State:</strong> <span id="state">IDLE</span></p>
+  </section>
+
+  <!-- Debug Metrics -->
+  <section class="card">
+    <h2>Pause Detection Metrics</h2>
+    <p><strong>Silence Timer:</strong> <span id="silence">0</span> ms</p>
+    <p><strong>Adaptive Threshold:</strong> <span id="threshold">0</span> ms</p>
+    <canvas id="energyCanvas" width="500" height="100"></canvas>
+  </section>
+
+  <!-- Controls -->
+  <section class="card">
+    <h2>Controls</h2>
+    <button id="startBtn">Start Interview</button>
+  </section>
+
+  <!-- Transcript -->
+  <section class="card">
+    <h2>Transcript (Simulated ASR)</h2>
+    <div id="transcript" class="transcript-box">
+      Waiting for interview to start...
+    </div>
+  </section>
 
   <script type="module" src="app.js"></script>
 </body>
 </html>
+
