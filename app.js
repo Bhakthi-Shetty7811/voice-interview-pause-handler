@@ -3,6 +3,14 @@ import { getVADState } from './audio/vad.js';
 import { updatePause } from './conversation/pauseLogic.js';
 import { updateStateMachine, getCurrentState } from './conversation/stateMachine.js';
 import { updateDebugPanel } from './ui/debugPanel.js';
+let turnCount = 0;
+let currentUtterance = "";
+
+const questions = [
+  "Tell me about a challenging project you worked on.",
+  "What was your role in that project?",
+  "What did you learn from this experience?"
+];
 
 let audioContext, analyser, dataArray;
 let silenceStart = null;
@@ -29,6 +37,11 @@ function processAudio() {
 
     const pauseResult = updatePause(energy, currentState);
 
+    if (energy > 5 && currentState === "USER_SPEAKING") {
+        currentUtterance += "word ";
+        transcriptEl.textContent = `Candidate: ${currentUtterance}`;
+    }
+
     updateStateMachine(pauseResult);
     updateDebugPanel({
         ...pauseResult,
@@ -36,6 +49,13 @@ function processAudio() {
     });
 
     if (pauseResult.interrupt) {
-        transcriptEl.textContent += ' [AI RESPONSE] ';
+        transcriptEl.textContent += "\n[End of candidate response]\n";
+
+        currentUtterance = "";
+        turnCount++;
+
+        const question = questions[turnCount % questions.length];
+        transcriptEl.textContent += `\nAI (${turnCount}): ${question}\n`;
     }
+
 }
